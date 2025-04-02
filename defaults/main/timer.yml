@@ -1,0 +1,14 @@
+---
+ANSIBLE_PULL_TIMER:
+  Unit:
+    Description: Ansible Pull Service Poller for System file maintenance
+    Requires: ansible-pull.service
+
+  Timer:
+    OnBootSec: 1min
+    OnCalendar: "{{ ANSIBLE_TIMER_SCHEDULE }}"
+    RandomizedDelaySec: 30m
+    Unit: ansible-pull.service
+
+  Install:
+    WantedBy: timers.target

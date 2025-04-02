@@ -1,0 +1,9 @@
+---
+- hosts: all
+  become: true
+  vars:
+
+  roles:
+    - role: ansible-pull
+      vars:
+        ANSIBLE_PLAYBOOK:

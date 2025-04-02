@@ -1,0 +1,2 @@
+{{ ansible_managed | comment }}
+{{ ANSIBLE_CRON_SCHEDULE }} {{ ANSIBLE_CRON_USER|default('root') }} {{ ANSIBLE_PULL_SCRIPT_PATH }}/ansible-pull-service >>{{ ANSIBLE_PULL_LOG }} 2>&1

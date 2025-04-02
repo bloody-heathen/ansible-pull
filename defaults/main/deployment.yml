@@ -1,0 +1,32 @@
+---
+# Deployment Controls
+ANSIBLE_SERVICE_ENABLED: true
+ANSIBLE_SERVICE_POLLER: true
+ANSIBLE_SERVICE_SCRIPT: true
+ANSIBLE_TIMER_ENABLED: true
+ANSIBLE_CRON_ENABLED: false
+ANSIBLE_LOGROTATE_ENABLED: true
+ANSIBLE_PULL_SCRIPT_PATH: /usr/local/bin
+
+# defaults file for ansible-pull
+ANSIBLE_PULL_USER:
+ANSIBLE_PULL_KEY:
+ANSIBLE_PULL_LOG: /var/log/ansible-pull.log
+# ANSIBLE_INVENTORY: '$(hostname --short),'
+ANSIBLE_REPO_URL:
+ANSIBLE_DIFF: true
+ANSIBLE_PURGE: true
+ANSIBLE_FORCE: true
+ANSIBLE_REPO_CLEAN: true
+ANSIBLE_TIMER_SCHEDULE: '*:0/05:00'
+ANSIBLE_CRON_SCHEDULE: '*/15 * * * *'
+ANSIBLE_CRON_USER:
+ANSIBLE_SSH_COMMON_ARGS:
+
+# Defaults for Ansible Pull Log Rotate
+ANSIBLE_LOGROTATE_OPTIONS:
+ - rotate 7
+ - daily
+ - compress
+ - missingok
+ - notifempty
