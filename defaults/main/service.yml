@@ -1,0 +1,12 @@
+---
+ANSIBLE_PULL_SERVICE_CONFIGURATION:
+  Unit:
+    Description: Ansible Pull Service for System file maintenance
+    After: network-online.target
+    Wants: ansible-pull.timer
+  Service:
+    Type: oneshot
+    ExecStart: "/bin/sh {{ ANSIBLE_PULL_SCRIPT_PATH }}/ansible-pull-service"
+    TimeoutStopSec: 1200
+  Install:
+    WantedBy: multi-user.target

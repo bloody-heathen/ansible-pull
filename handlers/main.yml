@@ -1,0 +1,26 @@
+---
+# handlers file for ansible-pull
+- name: Restart CRON
+  ansible.builtin.service:
+    name: cron.service
+    state: restarted
+
+- name: Reload Systemd and Enable Ansible-Pull
+  ansible.builtin.service:
+    name: ansible-pull.service
+    enabled: true
+    daemon_reload: true
+
+- name: Start Ansible-Pull
+  ansible.builtin.service:
+    name: ansible-pull.service
+    state: restarted
+  when: 
+    - ansible_managed is defined
+    - ansible_managed
+
+- name: Disable Ansible-Pull and reload systemd
+  ansible.builtin.service:
+    name: ansible-pull.service
+    enabled: false
+    daemon_reload: true

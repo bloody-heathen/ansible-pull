@@ -1,0 +1,9 @@
+---
+
+- name: Configuring system for automated pull cycle
+  ansible.builtin.include_tasks: configure.yml
+  when: state|default('present') == 'present'
+
+- name: Removing Ansible Pull service
+  ansible.builtin.include_tasks: uninstall.yml
+  when: state|default('present') == 'absent'

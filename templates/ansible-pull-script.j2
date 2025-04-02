@@ -1,0 +1,144 @@
+{{ ansible_managed | comment }}
+{%- macro pull() -%}
+{% set ansible_command = "ansible-pull" %}
+{% if ANSIBLE_PULL_USER is defined %}
+{% if ANSIBLE_PULL_USER %}
+{% set ansible_command = [ ansible_command," -u ",ANSIBLE_PULL_USER ]|join  %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_PULL_KEY is defined %}
+{% if ANSIBLE_PULL_KEY %}
+{% set ansible_command = [ ansible_command," --private-key ",ANSIBLE_PULL_KEY ]|join  %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_SSH_COMMON_ARGS is defined %}
+{% if ANSIBLE_SSH_COMMON_ARGS %}
+{% set ansible_command = [ ansible_command , " --ssh-common-args ",ANSIBLE_SSH_COMMON_ARGS ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_SCP_EXTRA_ARGS is defined %}
+{% if ANSIBLE_SCP_EXTRA_ARGS %}
+{% set ansible_command = [ ansible_command , " --scp-extra-args ",ANSIBLE_SCP_EXTRA_ARGS ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_SFTP_EXTRA_ARGS is defined %}
+{% if ANSIBLE_SFTP_EXTRA_ARGS %}
+{% set ansible_command = [ ansible_command , " --sftp-extra-args ",ANSIBLE_SFTP_EXTRA_ARGS ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_SSH_EXTRA_ARGS is defined %}
+{% if ANSIBLE_SSH_EXTRA_ARGS %}
+{% set ansible_command = [ ansible_command , " --ssh-extra-args ",ANSIBLE_SSH_EXTRA_ARGS ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_VAULT_IDS is defined %}
+{% if ANSIBLE_VAULT_IDS %}
+{% set ansible_command = [ ansible_command , " --vault-id ",ANSIBLE_VAULT_IDS ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_VAULT_PASSWORD_FILE is defined %}
+{% if ANSIBLE_VAULT_PASSWORD_FILE %}
+{% set ansible_command = [ ansible_command , " --vault-password-file ",ANSIBLE_VAULT_PASSWORD_FILE ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_EXTRA_VARS is defined %}
+{% if ANSIBLE_EXTRA_VARS %}
+{% set ansible_command = [ ansible_command , " -e ","\"",ANSIBLE_EXTRA_VARS|join(""),"\"" ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_TAGS is defined %}
+{% if ANSIBLE_TAGS %}
+{% set ansible_command = [ ansible_command , " -t ",ANSIBLE_TAGS|join(",") ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_SKIP_TAGS is defined %}
+{% if ANSIBLE_SKIP_TAGS %}
+{% set ansible_command = [ ansible_command , " --skip-tags ",ANSIBLE_SKIP_TAGS|join(',') ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_INVENTORY is defined %}
+{% if ANSIBLE_INVENTORY %}
+{% set ansible_command = [ ansible_command , " -i ","\"",ANSIBLE_INVENTORY,"\"" ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_LIST_HOSTS|default(false) %}
+{% set ansible_command = [ ansible_command , " --list-hosts" ]|join %}
+{% endif %}
+{% if ANSIBLE_LIMIT is defined %}
+{% if ANSIBLE_LIMIT %}
+{% set ansible_command = [ ansible_command , " -l ",ANSIBLE_LIMIT ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_MODULE_PATH is defined %}
+{% if ANSIBLE_MODULE_PATH %} 
+{% set ansible_command = [ ansible_command , " -M ",ANSIBLE_MODULE_PATH ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_PURGE|default(false) %}
+{% set ansible_command = [ ansible_command , " --purge" ]|join%}
+{% endif %}
+{% if ANSIBLE_CHANGE_ONLY|default(false) %}
+{% set ansible_command = [ ansible_command , " -o" ]|join %}
+{% endif %}
+{% if ANSIBLE_SLEEP is defined %}
+{% if ANSIBLE_SLEEP %}
+{% set ansible_command = [ ansible_command , " -s ",ANSIBLE_SLEEP ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_FORCE|default(false) %}
+{% set ansible_command = [ ansible_command , " -f" ]|join %}
+{% endif %}
+{% if ANSIBLE_DESTINATION_PATH is defined %}
+{% if ANSIBLE_DESTINATION_PATH %}
+{% set ansible_command = [ ansible_command , " -d ",ANSIBLE_DESTINATION_PATH ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_REPO_URL is defined %}
+{% if ANSIBLE_REPO_URL %}
+{% set ansible_command = [ ansible_command , " -U ",ANSIBLE_REPO_URL ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_FULL_CLONE|default(false) %}
+{% set ansible_command = [ ansible_command , " --full" ]|join %}
+{% endif %}
+{% if ANSIBLE_CHECKOUT is defined %}
+{% if ANSIBLE_CHECKOUT %}
+{% set ansible_command = [ ansible_command , " -C ",ANSIBLE_CHECKOUT ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_ACCEPT_HOST_KEY|default(false) %}
+{% set ansible_command = [ ansible_command , " --accept-host-key" ]|join %}
+{% endif %}
+{% if ANSIBLE_MODULE_NAME is defined %}
+{% if ANSIBLE_MODULE_NAME %}
+{% set ansible_command = [ ansible_command , " -m ",ANSIBLE_MODULE_NAME ]|join %}
+{% endif %}
+{% endif %}
+{% if ANSIBLE_VERIFY_COMMIT|default(false) %}
+{% set ansible_command = [ ansible_command , " --verify-commit" ]|join %}
+{% endif %}
+{% if ANSIBLE_REPO_CLEAN|default(false) %}
+{% set ansible_command = [ ansible_command , " --clean" ]|join %}
+{% endif %}
+{% if ANSIBLE_TRACK_SUBS|default(false) %}
+{% set ansible_command = [ ansible_command , " --track-subs"]|join %}
+{% endif %}
+{% if ANSIBLE_CHECK_MODE|default(false) %}
+{% set ansible_command = [ ansible_command , " --check"]|join %}
+{% endif %}
+{% if ANSIBLE_DIFF|default(false) %}
+{% set ansible_command = [ ansible_command , " --diff"]|join %}
+{% endif %}
+{% if ANSIBLE_PLAYBOOK is defined %}
+{% if ANSIBLE_PLAYBOOK %}
+{% set ansible_command = [ ansible_command ," ",ANSIBLE_PLAYBOOK ]|join %}
+{% endif %}
+{% endif %}
+{{ ansible_command }}
+{% endmacro %} 
+
+#!/bin/sh
+{% if ANSIBLE_PULL_TLS_IGNORE|default(false) %}
+export GIT_SSL_NO_VERIFY=true
+{% endif %}
+{{ pull().strip() }}

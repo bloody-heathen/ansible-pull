@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}
+# Last Audit(UTC): {{ now(utc=true,fmt='%Y-%m-%d %H:%M:%S') }}
+{% for section in config.keys() %}
+[{{ section }}]
+{% for key,value in config[section].items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+{% endfor %}

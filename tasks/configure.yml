@@ -1,0 +1,99 @@
+---
+# tasks file for ansible-pull
+
+- name: Gathering package facts for system
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Running Configuration Validation
+  block:
+
+    - name: Checking mutual exclusivity
+      ansible.builtin.fail:
+        msg: |
+          The configuration of systemd and cron at the same time
+          for the same same branch of code is not permitted. This may
+          cause conflicts during the deployment.
+      when:
+        - ANSIBLE_SERVICE_ENABLED
+        - ANSIBLE_CRON_ENABLED
+
+- name: Install Ansible repository to aquire latest stable code
+  ansible.builtin.apt_repository:
+    repo: ppa:ansible/ansible
+    state: present
+  when: ansible_distribution | lower == 'ubuntu'
+
+- name: Installing Ansible Core for Ubuntu Distro
+  ansible.builtin.apt:
+    name: ansible-core>=2.15.0
+    clean: true
+    update_cache: true
+    state: present
+  when: 
+    - ansible_distribution | lower == 'ubuntu'
+    - "'ansible-core' not in ansible_facts.packages"
+
+- name: '[RHEL] Install Ansible'
+  ansible.builtin.dnf:
+    name: ansible-core
+    state: present
+    update_cache: true
+  when: 
+    - ansible_distribution | lower == 'redhat'
+    - "'ansible-core' not in ansible_facts.packages"
+
+- name: Configure Ansible Pull service for post deployment code enforcement
+  ansible.builtin.template:
+    src: ansible-pull-service.j2
+    dest: /etc/systemd/system/ansible-pull.service
+    owner: root
+    group: root
+    mode: '0644'
+  when: ANSIBLE_SERVICE_ENABLED|default(false)
+  vars:
+    config: "{{ ANSIBLE_PULL_SERVICE_CONFIGURATION }}"
+
+- name: Create Ansible Pull script for systemd service
+  ansible.builtin.template:
+    src: ansible-pull-script.j2
+    dest: "{{ ANSIBLE_PULL_SCRIPT_PATH }}/ansible-pull-service"
+    owner: root
+    group: root
+    mode: '0750'
+  when: ANSIBLE_SERVICE_ENABLED|default(false)
+
+- name: Configure Ansible Pull service poller for post deployment code enforcement
+  ansible.builtin.template:
+    src: ansible-pull-service.j2
+    dest: /etc/systemd/system/ansible-pull.timer
+    owner: root
+    group: root
+    mode: '0644'
+  when: ANSIBLE_TIMER_ENABLED|default(false)
+  vars:
+    config: "{{ ANSIBLE_PULL_TIMER }}"
+
+- name: Configure Ansible Pull crontab entry for post deployment code enforcement
+  ansible.builtin.template:
+    src: ansible-pull-cron.j2
+    dest: /etc/cron.d/ansible-pull
+    owner: root
+    group: root
+    mode: '0644'
+  when: ANSIBLE_CRON_ENABLED| default(false)
+
+- name: Set logrotate for ansible pull
+  ansible.builtin.template:
+    src: ansible-pull-logrotate.j2
+    dest: /etc/logrotate.d/ansible-pull
+    owner: root
+    group: root
+    mode: '0644'
+  when: (ANSIBLE_CRON_ENABLED|default(false)) or (ANSIBLE_SERVICE_ENABLED|default(false))
+
+- name: Reload Systemd and Enable Ansible-Pull
+  ansible.builtin.systemd_service:
+    name: ansible-pull.service
+    enabled: true
+    daemon_reload: true

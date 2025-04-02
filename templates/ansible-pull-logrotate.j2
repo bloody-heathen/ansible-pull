@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+{{ ANSIBLE_PULL_LOG }} {
+{% for option in ANSIBLE_LOGROTATE_OPTIONS %}
+  {{ option }}
+{% endfor %}
+}

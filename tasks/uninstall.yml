@@ -1,0 +1,32 @@
+---
+
+- name: Removing Ansible Pull service files
+  ansible.builtin.file:
+    path:
+    state: absent
+  loop_control:
+    label: "Removing: {{ item }}"
+  loop:
+    - /etc/systemd/system/ansible-pull.service
+    - /etc/systemd/system/ansible-pull.timer
+    - /etc/cron.d/ansible-pull
+    - /etc/logrotate.d/ansible-pull
+    - "{{ ANSIBLE_PULL_SCRIPT_PATH | default('/usr/local/bin')}}/ansible-pull-service"
+  notify: Disable Ansible-Pull and reload systemd
+
+- name: Removing Ansible from managed host
+  ansible.builtin.package:
+    name: ansible
+    state: absent
+
+- name: '[Ubuntu] Removing Ansible repository'
+  ansible.builtin.apt_repository:
+    repo: ppa:ansible/ansible
+    state: absent
+  when: ansible_distribution | lower == 'ubuntu'
+
+- name: '[Red Hat] Removing Ansible repository'
+  ansible.builtin.yum_repository:
+    name: ansible-latest
+    description: Latest version of Ansible rpm packages
+  when: ansible_distribution | lower == 'redhat'
